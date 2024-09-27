@@ -12,6 +12,13 @@
 
 const prompt = require("prompt-sync")();
 
+const ROWS = 3;
+const COLS = 3;
+
+// create object in js, dont need "" in js
+const SYMBOLS_COUNT = {A: 2, B: 4, C: 6, D: 8}
+const SYMBOL_VALUES = {A: 5, B: 4, C: 3, D: 2}
+
 const deposit = () => {
     while(true) {
         const depositAmount = prompt("Enter a deposit amount: ");
@@ -25,8 +32,6 @@ const deposit = () => {
         }
     }
 };
-
-
 
 const getNumberOfLines = () => {
     while(true) {
@@ -52,6 +57,31 @@ const getBet = (balance, lines) => {
             return numberBet;
         }
     }
+};
+
+//spin machine, random
+const spin = () => {
+    const symbols = [];
+    // loop through all entries
+    for (const[symbol, count] of Object.entries(SYMBOLS_COUNT)){
+        for (let i = 0; i < count; i++){
+            symbol.push(symbol); // push is append in python
+        }
+    }
+
+        const reels = [[], [], []];
+        for (let i = 0; i < COLS; i++){
+            const reelSymbols = [...symbols]; // copy reels into different array
+            for (let j = 0; j < ROWS; j++){
+                // math random: 1, 0 times is but how many reels we have -1
+                // round down with math.floor
+                const randomIndex = Math.floor(Math.random() * reelSymbols.length);
+                const selectedSymbol = reelSymbols[randomIndex];
+                reels[i].push(selectedSymbol); // add to copied array
+                reelSymbols.splice(randomIndex, 1); // remove one element
+            }
+        }
+
 };
 
 
