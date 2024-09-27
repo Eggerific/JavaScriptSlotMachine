@@ -65,12 +65,13 @@ const spin = () => {
     // loop through all entries
     for (const[symbol, count] of Object.entries(SYMBOLS_COUNT)){
         for (let i = 0; i < count; i++){
-            symbol.push(symbol); // push is append in python
+            symbols.push(symbol); // push is append in python
         }
     }
 
-        const reels = [[], [], []];
+        const reels = [];
         for (let i = 0; i < COLS; i++){
+            reels.push([]);
             const reelSymbols = [...symbols]; // copy reels into different array
             for (let j = 0; j < ROWS; j++){
                 // math random: 1, 0 times is but how many reels we have -1
@@ -82,9 +83,82 @@ const spin = () => {
             }
         }
 
+    return reels;
 };
 
+//TRANSPOSING REELS
+const transpose = (reels) => {
+    const rows = [];
 
-let balance = deposit(); // allows the change of value
-const numberOfLines = getNumberOfLines();
-const bet = getBet(balance, numberOfLines);
+    for (let i = 0; i < ROWS; i++){
+        rows.push([]);
+        for (let j = 0; j < COLS; j++){
+            rows[i].push(reels[j][i]);
+        }
+    }
+
+    return rows
+;}
+
+const printRows = (rows) => {
+    // looping through array
+    for (const row of rows){
+        let rowString = "A";
+        for (const [i, symbol] of row.entries()){
+            rowString += symbol;
+            if (i != row.length - 1) {
+                rowString += " | ";
+            }
+        }
+        console.log(rowString)
+    }
+};
+
+const getWinnings = (rows, bet, lines) => {
+    let winnings = 0;
+
+    for (let row = 0; row < lines; row++) {
+        const symbols = rows[row];
+        let allSame = true;
+
+        for (const symbol of symbols) {
+            if (symbol != symbol[0]) {
+                allSame = false;
+                break;
+            }
+        }
+
+        if (allSame){
+            winnings += bet * SYMBOL_VALUES[symbols[0]]
+        }
+    }
+    return winnings;
+};
+
+const game = () => {
+
+    let balance = deposit(); // allows the change of value
+
+
+    while (true){
+        console.log("You have a balance of $" + balance);
+        const numberOfLines = getNumberOfLines();
+        const bet = getBet(balance, numberOfLines);
+        balance -= bet * numberOfLines;
+        const reels = spin();
+        const rows = transpose(reels);
+        printRows(rows);
+        const winnings = getWinnings(rows, bet, numberOfLines)
+        balance += winnings;
+        console.log("You Won, $" + winnings.toString() + "!");
+
+        if (balance <= 0){
+            console.log("You ran out of money!");
+            break;
+        }
+
+        const playAgain = prompt("Do you want to play again (y/n)? ");
+
+        if (playAgain != "y") break;
+    }
+}
